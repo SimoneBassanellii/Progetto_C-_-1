@@ -121,7 +121,71 @@ void Magazzino()
 
 
 
+void ControlloIngredientiPresenti()
+{
+	string s, nomeMagazzino, nomeLista, m;
+	int quantitaMagazzino, quantitaLista;
+    bool trovato = false;
+	ifstream ListaRead("listaspesa.csv", ios::app);
+	ofstream ListaWrite("listaspesaTemp.csv", ios::app);
+    ifstream MagazzinoRead("magazzino.csv", ios::app);
+    ofstream MagazzinoWrite("magazzinoTemp.csv", ios::app);
+	std::getline(MagazzinoRead, m);
+    // Il ciclo while scorre il file magazzino.csv riga per riga e verifica se ci sono gli ingredienti presenti nella lista della spesa  
+    while(!m.empty()) 
+    {
+		nomeMagazzino = m.substr(0, m.find(":")); // 
+		quantitaMagazzino = stoi(m.substr(m.find(":") + 1, m.length()));
+        trovato = false;
 
+		std::getline(ListaRead, s);
+        while (!s.empty())
+        {
+            // Trovare se il nomeMagazzino è presente in s, se è presente fare calcoli nella quantità, se non è presente ricopiare la linea
+            nomeLista = s.substr(0, s.find(":")); // 
+            quantitaLista = stoi(s.substr(s.find(":") + 1, s.length()));
+            
+            if (nomeMagazzino == nomeLista) 
+            {
+                trovato = true;
+                //scala quantità 
+                if (quantitaLista - quantitaMagazzino >= 0) // se quantità lista 
+                {
+                    //quantitaLista = quantitaLista-quantitaMagazzino; quantitaMagazzino = 0;
+                    quantitaLista = quantitaLista-quantitaMagazzino;
+                    quantitaMagazzino = 0;
+                    
+                    ListaWrite << nomeLista << ":" << quantitaLista << endl;
+                }
+                else 
+                {
+                    // abbiamo abbastanza ingredienti nel magazzino, cancella dalla lista della spesa; quantitaMagazzino = quantitaMagazzino - quantitaLista
+                    quantitaMagazzino =  quantitaMagazzino - quantitaLista;
+                    
+                }
+
+                std::remove("listaspesa.csv");
+                std::rename("listaspesaTemp.csv", "listaspesa.csv");
+                std::remove("listaspesaTemp.csv");
+            }
+            
+			std::getline(ListaRead, s);
+		}
+
+        MagazzinoWrite << nomeMagazzino << ":" << quantitaMagazzino << endl;
+
+        std::remove("magazzino.csv");
+        std::rename("magazzinoTemp.csv", "magazzino.csv");
+        std::remove("magazzinoTemp.csv");
+
+		std::getline(MagazzinoRead, m);
+
+	}
+	ListaRead.close();
+	ListaWrite.close();
+    MagazzinoWrite.close();
+    MagazzinoRead.close();
+}
 
 
 
@@ -152,6 +216,9 @@ void ControlloMagazzino(string ingredienti)
 
         ListaSpesa(nome, quantita); //non somma
     }
+
+    //Controllare se nella lista della spesa c'è già l'ingrediente e se non c'è aggiungerlo dalla lista della spesa
+    
 
     sr.close();
 
@@ -185,6 +252,7 @@ int main()
         case 2:
             ingredienti = Ingredienti(RicettaCompleta("creme brulee"));
             ControlloMagazzino(ingredienti);
+
             break;
         case 3:
             ingredienti = Ingredienti(RicettaCompleta("crostata"));
@@ -194,9 +262,12 @@ int main()
 
             break;
         }
+
+        
     }
     
     //rinominare il file vecchio
+    ControlloIngredientiPresenti();
     std::remove("listaspesaVecchia.csv");
     std::rename("listaspesa.csv", "listaspesaVecchia.csv");
     std::remove("magazzinoTemp.csv");
