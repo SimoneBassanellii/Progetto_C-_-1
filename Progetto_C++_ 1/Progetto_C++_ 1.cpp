@@ -132,57 +132,6 @@ void ControlloIngredientiPresenti()
     
     ofstream ListaWrite("listaspesaTemp.csv", ios::app);
 
-    /*std::getline(MagazzinoRead, m);
-        // Il ciclo while scorre il file magazzino.csv riga per riga e verifica se ci sono gli ingredienti presenti nella lista della spesa
-        while(!m.empty())
-        {
-    nomeMagazzino = m.substr(0, m.find(":")); //
-    quantitaMagazzino = stoi(m.substr(m.find(":") + 1, m.length()));
-            trovato = false;
-
-    std::getline(ListaRead, s);
-            while (!s.empty())
-            {
-                // Trovare se il nomeMagazzino è presente in s, se è presente fare calcoli nella quantità, se non è presente ricopiare la linea
-                nomeLista = s.substr(0, s.find(":")); //
-                quantitaLista = stoi(s.substr(s.find(":") + 1, s.length()));
-
-                if (nomeMagazzino == nomeLista)
-                {
-                    trovato = true;
-                    //scala quantità
-                    if (quantitaLista - quantitaMagazzino > 0) // se quantità lista
-                    {
-                        //quantitaLista = quantitaLista-quantitaMagazzino; quantitaMagazzino = 0;
-                        quantitaLista = quantitaLista-quantitaMagazzino;
-                        quantitaMagazzino = 0;
-
-                        ListaWrite << nomeLista << ":" << quantitaLista << endl;
-                    }
-                    else
-                    {
-                        // abbiamo abbastanza ingredienti nel magazzino, cancella dalla lista della spesa; quantitaMagazzino = quantitaMagazzino - quantitaLista
-                        quantitaMagazzino =  quantitaMagazzino - quantitaLista;
-
-                    }
-
-                    std::remove("listaspesa.csv");
-                    std::rename("listaspesaTemp.csv", "listaspesa.csv");
-                    std::remove("listaspesaTemp.csv");
-                }
-
-    std::getline(ListaRead, s);
-    }
-
-            MagazzinoWrite << nomeMagazzino << ":" << quantitaMagazzino << endl;
-
-            std::remove("magazzino.csv");
-            std::rename("magazzinoTemp.csv", "magazzino.csv");
-            std::remove("magazzinoTemp.csv");
-
-    std::getline(MagazzinoRead, m);
-
-    }*/
     std::getline(ListaRead, s);
 
     while (!s.empty())
@@ -296,7 +245,53 @@ void ControlloMagazzino(string ingredienti)
 
 }
 
+void Compra()
+{
+    string s,m,nomeLista, nomeMagazzino;
+    int quantitaLista, quantitaMagazzino;
+    float quantita;
+    int ricavo;
+    ifstream Leggiamo("listaspesa.csv");
+   
 
+    std::getline(Leggiamo, s);
+    
+    while (!s.empty())
+    {
+        nomeLista = s.substr(0, s.find(":")); // estrai nome
+        quantitaLista = stoi(s.substr(s.find(":") + 1, s.length())); // estrai quantita
+
+        quantita = quantitaLista;
+
+        ofstream MagazzinoWrite("magazzinoTemp.csv", ios::app);
+        ifstream MagazzinoRead("magazzino.csv");
+
+        ricavo = ceil(quantita / 500) * 500 - quantita;
+        std::getline(MagazzinoRead, m);
+        while (!m.empty()) 
+        {
+            nomeMagazzino = m.substr(0, m.find(":")); // estrai nome
+            quantitaMagazzino = stoi(m.substr(m.find(":") + 1, m.length())); //estrai quantita
+            if (nomeLista == nomeMagazzino)
+            {
+                quantitaMagazzino = quantitaMagazzino + ricavo;
+            }
+
+            MagazzinoWrite << nomeMagazzino << ":" << quantitaMagazzino << endl;
+
+            std::getline(MagazzinoRead, m);
+        }
+
+        MagazzinoRead.close();
+        MagazzinoWrite.close();
+        std::remove("magazzino.csv");
+        std::rename("magazzinoTemp.csv", "magazzino.csv");
+        std::remove("magazzinoTemp.csv");
+
+
+        std::getline(Leggiamo, s);
+    }
+}
 
 
 
@@ -309,7 +304,7 @@ int main()
     int scelta = -1;
     Magazzino();
     cout << "Buongiorno, che dolce desidera ordinare?\n";
-    cout << "1 - Sacher\n 2 - Creme Brulee\n 3 - Crostata\n";
+    cout << "1 - sacher\n 2 - creme brulee\n 3 - crostata\n";
 
     while (scelta != 0)
     {
@@ -337,8 +332,17 @@ int main()
 
     }
 
+    /*while (scelta != "0")
+    {
+        cin >> scelta;
+        ingredienti = Ingredienti(RicettaCompleta(scelta));
+        ControlloMagazzino(ingredienti);
+
+    }*/
+
     //rinominare il file vecchio
     ControlloIngredientiPresenti();
+    Compra();
     std::remove("listaspesaVecchia.csv");
     std::rename("listaspesa.csv", "listaspesaVecchia.csv");
     std::remove("magazzinoTemp.csv");
