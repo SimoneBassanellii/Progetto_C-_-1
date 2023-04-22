@@ -295,6 +295,41 @@ void Compra()
 }
 
 
+void Aggiungi() // NON FINITO
+{
+    string s, m, nomeLista, nomeMagazzino;
+    int quantitaLista, quantitaMagazzino;
+    float quantita;
+    int ricavo;
+
+
+    ofstream MagazzinoWrite("magazzinoTemp.csv", ios::app);
+    ifstream MagazzinoRead("magazzino.csv");
+
+    ricavo = ceil(quantita / 500) * 500 - quantita;
+    std::getline(MagazzinoRead, m);
+    while (!m.empty())
+    {
+        nomeMagazzino = m.substr(0, m.find(":")); // estrai nome
+        quantitaMagazzino = stoi(m.substr(m.find(":") + 1, m.length())); //estrai quantita
+        if (nomeLista == nomeMagazzino)
+        {
+            quantitaMagazzino = quantitaMagazzino + ricavo;
+        }
+
+        MagazzinoWrite << nomeMagazzino << ":" << quantitaMagazzino << endl;
+
+        std::getline(MagazzinoRead, m);
+    }
+
+    MagazzinoRead.close();
+    MagazzinoWrite.close();
+    std::remove("magazzino.csv");
+    std::rename("magazzinoTemp.csv", "magazzino.csv");
+    std::remove("magazzinoTemp.csv");
+}
+
+
 
 void Ordine()
 {
