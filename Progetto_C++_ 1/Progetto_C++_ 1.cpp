@@ -30,7 +30,7 @@ string RicettaCompleta(string nome)
 void ListaSpesa(string nome, float quantita)
 {
     bool trovato = false;
-    string s, nomeTemp = "";
+    string s, nomeTemp = "", tipo;
     int quantitaTemp;
     ifstream ListaRead("listaspesa.csv", ios::app);
     ofstream ListaWrite("listaspesaTemp.csv", ios::app);
@@ -50,45 +50,30 @@ void ListaSpesa(string nome, float quantita)
     while (!s.empty())
     {
         nomeTemp = s.substr(0, s.find(":"));
-        quantitaTemp = stoi(s.substr(s.find(":") + 1, s.length()));
+        quantitaTemp = stoi(s.substr(s.find(":") + 1, s.find("_")));
+        tipo = s.substr(s.find("_") + 1, s.length());
         if (nome == nomeTemp)
         {
             trovato = true;
             //scala quantità e lista della spesa
             quantita = quantita + quantitaTemp;
-            ListaWrite << nome << ":" << quantita << endl;
+            ListaWrite << nome << ":" << quantita << "_" << tipo << endl;
         }
         else
         {
-            ListaWrite << nomeTemp << ":" << quantitaTemp << endl;
+            ListaWrite << nomeTemp << ":" << quantitaTemp << "_" << tipo << endl;
         }
 
 
         //Fai il nuovo file copia e aggiungi
         std::getline(ListaRead, s);
     }
-    /* {
-        nomeTemp = s.substr(0, s.find(";"));
-        quantitaTemp = stoi(s.substr(s.find(":") + 1, s.length()));
-
-        if (nome == nomeTemp)
-        {
-            trovato = true;
-            //scala quantità e lista della spesa
-            quantita = quantita + quantitaTemp;
-
-            ListaWrite << nome << ":" << quantita << endl;
-
-        }
-
-        //Fai il nuovo file copia e aggiungi
-        std::getline(ListaRead, s);
-    }*/
+  
 
     if (!trovato)
     {
         //aggiungi ingrediente:0 e lista della spesa
-        ListaWrite << nome << ":" << quantita << endl;
+        ListaWrite << nome << ":" << quantita << "_" << tipo << endl;
     }
 
     ListaRead.close();
@@ -115,8 +100,8 @@ void Magazzino()
 {
     ofstream Magazzino("magazzino.csv" /*ios::app*/);
 
-    Magazzino << "farina:90\n";
-    Magazzino << "zucchero:100\n";
+    Magazzino << "farina:90_g\n";
+    Magazzino << "zucchero:100_g\n";
 
     Magazzino.close();
 }
@@ -126,7 +111,7 @@ void Magazzino()
 
 void ControlloIngredientiPresenti()
 {
-    string s, nomeMagazzino, nomeLista, m;
+    string s, nomeMagazzino, nomeLista, m, tipo, tipoTemp;
     int quantitaMagazzino, quantitaLista;
     bool trovato = false;
     ifstream ListaRead("listaspesa.csv");
@@ -138,7 +123,9 @@ void ControlloIngredientiPresenti()
     while (!s.empty())
     {
         nomeLista = s.substr(0, s.find(":")); // estrai nome
-        quantitaLista = stoi(s.substr(s.find(":") + 1, s.length())); // estrai quantita
+        quantitaLista = stoi(s.substr(s.find(":") + 1, s.find("_"))); // estrai quantita
+        tipoTemp = s.substr(s.find("_") + 1, s.length()); // estrai tipo
+        
 
         ofstream MagazzinoWrite("magazzinoTemp.csv", ios::app);
         ifstream MagazzinoRead("magazzino.csv");
@@ -147,7 +134,8 @@ void ControlloIngredientiPresenti()
         while (!m.empty())
         {
             nomeMagazzino = m.substr(0, m.find(":")); // estrai nome
-            quantitaMagazzino = stoi(m.substr(m.find(":") + 1, m.length())); //estrai quantita
+            quantitaMagazzino = stoi(m.substr(m.find(":") + 1, m.find("_"))); //estrai quantita
+            tipo = m.substr(m.find("_") + 1, m.length()); // estrai tipo
 
             if (nomeLista == nomeMagazzino)
             {
@@ -158,7 +146,7 @@ void ControlloIngredientiPresenti()
                     quantitaLista = quantitaLista - quantitaMagazzino;
                     quantitaMagazzino = 0;
                     //scivo nella lista
-                    ListaWrite << nomeLista << ":" << quantitaLista << endl;
+                    ListaWrite << nomeLista << ":" << quantitaLista << "_" << tipo << endl;
                 }
                 else
                 {
@@ -167,7 +155,7 @@ void ControlloIngredientiPresenti()
                 }
             }
             //scrivo nel magazzino
-            MagazzinoWrite << nomeMagazzino << ":" << quantitaMagazzino << endl;
+            MagazzinoWrite << nomeMagazzino << ":" << quantitaMagazzino << "_" << tipo << endl;
             //sovrascrivo magazzino
 
 
@@ -180,9 +168,9 @@ void ControlloIngredientiPresenti()
             nomeMagazzino = nomeLista;
             quantitaMagazzino = 0;
             //scrivo nel magazzino
-            MagazzinoWrite << nomeMagazzino << ":" << quantitaMagazzino << endl;
+            MagazzinoWrite << nomeMagazzino << ":" << quantitaMagazzino << "_" << tipoTemp << endl;
             //riscrivo nella lista
-            ListaWrite << nomeLista << ":" << quantitaLista << endl;
+            ListaWrite << nomeLista << ":" << quantitaLista << "_" << tipoTemp << endl;
         }
 
         MagazzinoRead.close();
@@ -232,7 +220,7 @@ void ControlloMagazzino(string ingredienti)
     for (int i = 0; i < dim; i++)
     {
         nome = nomi_e_ingre[i].substr(0, nomi_e_ingre[i].find(":"));
-        quantita = stoi(nomi_e_ingre[i].substr(nomi_e_ingre[i].find(":") + 1, nomi_e_ingre[i].length()));
+        quantita = stoi(nomi_e_ingre[i].substr(nomi_e_ingre[i].find(":") + 1, nomi_e_ingre[i].find("_")));
 
 
         ListaSpesa(nome, quantita); //non somma
@@ -248,7 +236,7 @@ void ControlloMagazzino(string ingredienti)
 
 void Compra()
 {
-    string s,m,nomeLista, nomeMagazzino;
+    string s,m,nomeLista, nomeMagazzino, tipo;
     int quantitaLista, quantitaMagazzino;
     float quantita;
     int ricavo;
@@ -260,7 +248,8 @@ void Compra()
     while (!s.empty())
     {
         nomeLista = s.substr(0, s.find(":")); // estrai nome
-        quantitaLista = stoi(s.substr(s.find(":") + 1, s.length())); // estrai quantita
+        quantitaLista = stoi(s.substr(s.find(":") + 1, s.find("_"))); // estrai quantita
+        tipo = stoi(s.substr(s.find("_") + 1, s.length()));
 
         quantita = quantitaLista;
 
@@ -278,7 +267,7 @@ void Compra()
                 quantitaMagazzino = quantitaMagazzino + ricavo;
             }
 
-            MagazzinoWrite << nomeMagazzino << ":" << quantitaMagazzino << endl;
+            MagazzinoWrite << nomeMagazzino << ":" << quantitaMagazzino << "_" << tipo << endl;
 
             std::getline(MagazzinoRead, m);
         }
@@ -295,29 +284,28 @@ void Compra()
 }
 
 
-void Aggiungi() // NON FINITO
+void Aggiungi()
 {
-    string s, m, nomeLista, nomeMagazzino;
+    string s, m, nomeLista, nomeMagazzino, tipo;
     int quantitaLista, quantitaMagazzino;
-    float quantita;
-    int ricavo;
-
 
     ofstream MagazzinoWrite("magazzinoTemp.csv", ios::app);
     ifstream MagazzinoRead("magazzino.csv");
 
-    ricavo = ceil(quantita / 500) * 500 - quantita;
+
     std::getline(MagazzinoRead, m);
     while (!m.empty())
     {
         nomeMagazzino = m.substr(0, m.find(":")); // estrai nome
-        quantitaMagazzino = stoi(m.substr(m.find(":") + 1, m.length())); //estrai quantita
-        if (nomeLista == nomeMagazzino)
+        quantitaMagazzino = stoi(m.substr(m.find(":") + 1, m.find("_"))); //estrai quantita
+        tipo = stoi(s.substr(s.find("_") + 1, s.length()));
+
+        if (quantitaMagazzino == 0)
         {
-            quantitaMagazzino = quantitaMagazzino + ricavo;
+            quantitaMagazzino = 500;
         }
 
-        MagazzinoWrite << nomeMagazzino << ":" << quantitaMagazzino << endl;
+        MagazzinoWrite << nomeMagazzino << ":" << quantitaMagazzino << "_" << tipo << endl;
 
         std::getline(MagazzinoRead, m);
     }
@@ -367,6 +355,7 @@ void Ordine()
         {
             ingredienti = Ingredienti(ricetta);
             ControlloMagazzino(ingredienti);
+            
         }
         else
         {
@@ -379,6 +368,7 @@ void Ordine()
     //rinominare il file vecchio
     ControlloIngredientiPresenti();
     Compra();
+    Aggiungi();
     std::remove("listaspesaVecchia.csv");
     std::rename("listaspesa.csv", "listaspesaVecchia.csv");
     std::remove("magazzinoTemp.csv");
