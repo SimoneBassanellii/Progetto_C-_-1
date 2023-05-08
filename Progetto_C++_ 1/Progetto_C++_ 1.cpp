@@ -403,7 +403,7 @@ void AggiungiRicetta()
     string nome, ingredienti, preparazione, s;
     cout << "Inserisci il nome della ricetta" << endl;
     cin >> nome;
-    cout << "Inserisci gli ingredienti (attenzione alla formattazione Sintassi = ingrediente1:quantita,ingrediente2:quantita...)" << endl;
+    cout << "Inserisci gli ingredienti (attenzione alla formattazione Sintassi = ingrediente1:quantita_tipo,ingrediente2:quantita_tipo...)" << endl;
     cin >> ingredienti;
     cout << "Inserisci la preparazione (attenzione alla formattazione Sintassi = Frase 1. Frase 2. ...)" << endl;
     cin >> preparazione;
@@ -439,7 +439,7 @@ void ModificaRicetta() {
     string nome, ingredienti, preparazione, s;
     cout << "Inserisci il nome della ricetta da modificare" << endl;
     cin >> nome;
-    cout << "Inserisci gli ingredienti (attenzione alla formattazione Sintassi = ingrediente1:quantita,ingrediente2:quantita...)" << endl;
+    cout << "Inserisci gli ingredienti (attenzione alla formattazione Sintassi = ingrediente1:quantita_tipo,ingrediente2:quantita_tipo...)" << endl;
     cin >> ingredienti;
     cout << "Inserisci la preparazione (attenzione alla formattazione Sintassi = Frase 1. Frase 2. ...)" << endl;
     cin >> preparazione;
