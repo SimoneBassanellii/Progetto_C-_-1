@@ -27,19 +27,13 @@ string RicettaCompleta(string nome)
 
 
 
-void ListaSpesa(string nome, float quantita)
+void ListaSpesa(string nome, float quantita, string tipoIngrediente)
 {
     bool trovato = false;
     string s, nomeTemp = "", tipo;
     int quantitaTemp;
     ifstream ListaRead("listaspesa.csv", ios::app);
     ofstream ListaWrite("listaspesaTemp.csv", ios::app);
-
-
-    //ListaWrite << ingrediente << ":" << quantità;
-    //cout << ceil(quantità / 500);
-
-    //int ricavo = ceil(quantità / 500) * 500 - quantità;
 
 
 
@@ -52,12 +46,13 @@ void ListaSpesa(string nome, float quantita)
         nomeTemp = s.substr(0, s.find(":"));
         quantitaTemp = stoi(s.substr(s.find(":") + 1, s.find("_")));
         tipo = s.substr(s.find("_") + 1, s.length());
+
         if (nome == nomeTemp)
         {
             trovato = true;
             //scala quantità e lista della spesa
             quantita = quantita + quantitaTemp;
-            ListaWrite << nome << ":" << quantita << "_" << tipo << endl;
+            ListaWrite << nome << ":" << quantita << "_" << tipoIngrediente << endl;
         }
         else
         {
@@ -73,7 +68,7 @@ void ListaSpesa(string nome, float quantita)
     if (!trovato)
     {
         //aggiungi ingrediente:0 e lista della spesa
-        ListaWrite << nome << ":" << quantita << "_" << tipo << endl;
+        ListaWrite << nome << ":" << quantita << "_" << tipoIngrediente << endl;
     }
 
     ListaRead.close();
@@ -100,8 +95,13 @@ void Magazzino()
 {
     ofstream Magazzino("magazzino.csv" /*ios::app*/);
 
-    Magazzino << "farina:90_g\n";
-    Magazzino << "zucchero:100_g\n";
+    srand(time(NULL));
+    
+
+    Magazzino << "farina:"<< rand() % 1000 << "_g\n";
+    Magazzino << "zucchero:" << rand() % 1000 << "_g\n";
+    Magazzino << "uova:" << rand() % 50 << "_u\n";
+    Magazzino << "latte:" << rand() % 2000 << "_ml\n";
 
     Magazzino.close();
 }
@@ -201,7 +201,9 @@ void ControlloIngredientiPresenti()
 void ControlloMagazzino(string ingredienti)
 {
     int dim = 0;
-    string nomi_e_ingre[100];
+    string nomi_e_ingre[100], tipo;
+
+    //mettiamo gli ingredienti in un array
     while (ingredienti.find(",") != string::npos)
     {
         nomi_e_ingre[dim] = ingredienti.substr(0, ingredienti.find(","));
@@ -212,6 +214,7 @@ void ControlloMagazzino(string ingredienti)
     nomi_e_ingre[dim] = ingredienti;
     dim++;
 
+
     string nome, nomeTemp, s;
     int quantita, quantitaTemp;
     bool trovato = false;
@@ -221,9 +224,10 @@ void ControlloMagazzino(string ingredienti)
     {
         nome = nomi_e_ingre[i].substr(0, nomi_e_ingre[i].find(":"));
         quantita = stoi(nomi_e_ingre[i].substr(nomi_e_ingre[i].find(":") + 1, nomi_e_ingre[i].find("_")));
+        tipo = nomi_e_ingre[i].substr(nomi_e_ingre[i].find("_") + 1, nomi_e_ingre[i].length());
 
 
-        ListaSpesa(nome, quantita); //non somma
+        ListaSpesa(nome, quantita, tipo); //non somma
     }
 
     //Controllare se nella lista della spesa c'è già l'ingrediente e se non c'è aggiungerlo dalla lista della spesa
@@ -234,9 +238,28 @@ void ControlloMagazzino(string ingredienti)
 
 }
 
+
+float QuantitaDefault(string tipo) 
+{
+    float quantita;
+    if (tipo == "g")
+    {
+		quantita = 500;
+	}
+    else if (tipo == "ml")
+    {
+		quantita = 1000;
+	}
+    else if (tipo == "u")
+    {
+		quantita = 12;
+	}
+	return quantita;
+}
+
 void Compra()
 {
-    string s,m,nomeLista, nomeMagazzino, tipo;
+    string s,m,nomeLista, nomeMagazzino, tipo, tipoMagazzino;
     int quantitaLista, quantitaMagazzino;
     float quantita;
     int ricavo;
@@ -249,25 +272,26 @@ void Compra()
     {
         nomeLista = s.substr(0, s.find(":")); // estrai nome
         quantitaLista = stoi(s.substr(s.find(":") + 1, s.find("_"))); // estrai quantita
-        tipo = stoi(s.substr(s.find("_") + 1, s.length()));
+        tipo = s.substr(s.find("_") + 1, s.length());
 
         quantita = quantitaLista;
 
         ofstream MagazzinoWrite("magazzinoTemp.csv", ios::app);
         ifstream MagazzinoRead("magazzino.csv");
 
-        ricavo = ceil(quantita / 500) * 500 - quantita;
+        ricavo = ceil(quantita / QuantitaDefault(tipo)) * QuantitaDefault(tipo) - quantita;
         std::getline(MagazzinoRead, m);
         while (!m.empty()) 
         {
             nomeMagazzino = m.substr(0, m.find(":")); // estrai nome
             quantitaMagazzino = stoi(m.substr(m.find(":") + 1, m.length())); //estrai quantita
+            tipoMagazzino = m.substr(m.find("_") + 1, m.length());
             if (nomeLista == nomeMagazzino)
             {
                 quantitaMagazzino = quantitaMagazzino + ricavo;
             }
 
-            MagazzinoWrite << nomeMagazzino << ":" << quantitaMagazzino << "_" << tipo << endl;
+            MagazzinoWrite << nomeMagazzino << ":" << quantitaMagazzino << "_" << tipoMagazzino << endl;
 
             std::getline(MagazzinoRead, m);
         }
@@ -298,11 +322,11 @@ void Aggiungi()
     {
         nomeMagazzino = m.substr(0, m.find(":")); // estrai nome
         quantitaMagazzino = stoi(m.substr(m.find(":") + 1, m.find("_"))); //estrai quantita
-        tipo = stoi(s.substr(s.find("_") + 1, s.length()));
+        tipo = m.substr(m.find("_") + 1, m.length());
 
         if (quantitaMagazzino == 0)
         {
-            quantitaMagazzino = 500;
+            quantitaMagazzino = QuantitaDefault(tipo);
         }
 
         MagazzinoWrite << nomeMagazzino << ":" << quantitaMagazzino << "_" << tipo << endl;
@@ -333,7 +357,7 @@ void Ordine()
 
     ifstream Ricette("ricettario.csv");
     Magazzino();
-    cout << "Buongiorno, che dolce desidera ordinare?\nScrivilo come indicato (Case Sensitive)\n" << endl;
+    cout << "Buongiorno, che dolce desidera ordinare?\nScrivi i? nome come indicato (Case Sensitive)\n" << endl;
     
     std::getline(Ricette, s);
     while (!s.empty()) 
