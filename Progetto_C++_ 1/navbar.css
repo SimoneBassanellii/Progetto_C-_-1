@@ -1,0 +1,79 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+
+@keyframes gradient {
+    0% {
+        background-position: 0% 0%;
+    }
+    50% {
+        background-position: 100% 100%;
+    }
+    100% {
+        background-position: 0% 0%;
+    }
+}
+
+.menu a {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 300;
+    font-size: 14px;
+    color: white;
+    text-decoration: none;
+}
+
+a {
+    text-decoration:  none;
+    color: whitesmoke;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30px 10%;
+    background-color: #242424;
+    position: sticky;
+    top: 0;
+}
+
+.menu {
+    list-style: none;
+}
+
+.menu li {
+    display: inline-block;
+    padding: 0 20px;
+}
+
+
+.menu li a {
+    transition: all .3s ease;
+
+}
+
+.menu a:hover{
+    color: #ff0000;
+}
+
+.stemma {
+    width: 65px;
+}
+
+.bari {
+    color: whitesmoke;
+    font-size: 60px;
+    text-shadow: 2px 2px 8px #8a8585;
+    transition: all .3s ease;
+    list-style:  none;
+}
+
+.bari:hover {
+    color: whitesmoke;
+    font-size: 60px;
+    text-shadow: 2px 2px 8px #923838;
+
+}
