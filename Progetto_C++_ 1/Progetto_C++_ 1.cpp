@@ -402,7 +402,7 @@ void Ordine()
     Ricette.close();
 
 
-    cin >> scelta;
+    cin >> scelta; 
     while (scelta != "0")
     {
         ricetta = RicettaCompleta(scelta);
