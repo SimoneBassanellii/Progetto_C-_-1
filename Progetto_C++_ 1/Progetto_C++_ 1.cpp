@@ -108,6 +108,36 @@ void Magazzino()
 
 
 
+void ricettarioSito()
+{
+    ofstream Magazzino("ricettarioSito.html" /*ios::app*/);
+
+    Magazzino << "<div id = \"header\">";
+
+    Magazzino.close();
+}
+
+
+void rcSitoricette(string ricetta)
+{
+    ofstream Magazzino("ricettarioSito.html", ios::app);
+
+    Magazzino << ricetta << endl;
+
+    Magazzino.close();
+}
+
+
+void ricettarioSitoEnd()
+{
+    ofstream Magazzino("ricettarioSito.html", ios::app);
+
+    Magazzino << "</div>";
+
+    Magazzino.close();
+}
+
+
 
 void ControlloIngredientiPresenti()
 {
@@ -356,7 +386,8 @@ void Ordine()
 
 
     ifstream Ricette("ricettario.csv");
-    Magazzino();
+
+    ricettarioSito();
     cout << "Buongiorno, che dolce desidera ordinare?\nScrivi il nome come indicato (Case Sensitive)\n" << endl;
 
     std::getline(Ricette, s);
@@ -375,6 +406,9 @@ void Ordine()
     while (scelta != "0")
     {
         ricetta = RicettaCompleta(scelta);
+        
+        rcSitoricette(ricetta);
+
         if (ricetta != "NoN")
         {
             ingredienti = Ingredienti(ricetta);
@@ -393,6 +427,8 @@ void Ordine()
     ControlloIngredientiPresenti();
     Compra();
     Aggiungi();
+    //qui aggiungi
+    ricettarioSitoEnd();
     std::remove("listaspesaVecchia.csv");
     std::rename("listaspesa.csv", "listaspesaVecchia.csv");
     std::remove("magazzinoTemp.csv");

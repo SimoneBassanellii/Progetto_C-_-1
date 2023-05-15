@@ -17,21 +17,34 @@ body {
     background-attachment: fixed;*/
 }
 .container {
-    padding-right: 30%;
-    padding-left: 30%;
+    padding-right: 20%;
+    padding-left: 20%;
     padding-top: 25px;
     font-size: 28px;
     padding-bottom: 25px;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     
+    
 }
 
-.sfondo {
-    background: rgba(212, 212, 212, 0.712);
+.sfondotitolo {
+    background: rgba(67, 67, 67, 0.812);
     text-align: center;
     padding-right: 10%;
     padding-left: 10%;
+    color:rgb(83, 214, 214);
     
+}
+
+.sfondo {
+    /*background: rgba(212, 212, 212, 0.812);*/
+    background: rgba(67, 67, 67, 0.812);
+    text-align: center;
+    padding-right: 10%;
+    padding-left: 10%;
+    padding-top: 25px;
+    padding-bottom: 25px;
+    color: aliceblue;
 }
 
 h1 {
