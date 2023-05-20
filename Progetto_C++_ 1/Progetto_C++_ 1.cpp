@@ -155,6 +155,30 @@ string Ingredienti(string ricetta)
     return ingredienti;
 }
 
+void ricettarioCompletoSito()
+{
+    ifstream MagazzinoRead("ricettario.csv");
+    ofstream Magazzino("ricettarioSito.html" /*ios::app*/);
+
+    string s;
+
+    Magazzino << "<div id = \"header\">";
+
+    getline(MagazzinoRead, s);
+
+    while (!s.empty())
+    {
+        Magazzino << s << "<br>\n";
+        getline(MagazzinoRead, s);
+    }
+
+
+    Magazzino << "</div>";
+
+    Magazzino.close();
+}
+
+
 void Magazzino()
 {
     ofstream Magazzino("magazzino.csv" /*ios::app*/);
@@ -174,7 +198,7 @@ void Magazzino()
 
 void ricettarioSito()
 {
-    ofstream Magazzino("ricettarioSito.html" /*ios::app*/);
+    ofstream Magazzino("ordiniSito.html" /*ios::app*/);
 
     Magazzino << "<div id = \"header\">";
 
@@ -184,7 +208,7 @@ void ricettarioSito()
 
 void rcSitoricette(string ricetta)
 {
-    ofstream Magazzino("ricettarioSito.html", ios::app);
+    ofstream Magazzino("ordiniSito.html", ios::app);
 
     Magazzino << ricetta << "<br>\n";
 
@@ -194,7 +218,7 @@ void rcSitoricette(string ricetta)
 
 void ricettarioSitoEnd()
 {
-    ofstream Magazzino("ricettarioSito.html", ios::app);
+    ofstream Magazzino("ordiniSito.html", ios::app);
 
     Magazzino << "</div>";
 
@@ -227,6 +251,9 @@ void magazzinoSito()
 
     Magazzino.close();
 }
+
+
+
 
 
 void listaSpesaSito()
@@ -513,7 +540,7 @@ void Ordine()
 
     ifstream Ricette("ricettario.csv");
 
-    ricettarioSito();
+    ricettarioCompletoSito();
     cout << "Buongiorno, che dolce desidera ordinare?\nScrivi il nome come indicato (Case Sensitive)\n" << endl;
 
     std::getline(Ricette, s);
@@ -684,6 +711,8 @@ void CRUD()
         case 0:
             break;
         }
+
+        ricettarioCompletoSito();
     }
 
 
@@ -693,6 +722,7 @@ int main()
 {
     Magazzino();
     magazzinoSito();
+    ricettarioSito();
 
     int scelta;
 
