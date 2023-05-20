@@ -200,7 +200,7 @@ void ricettarioSito()
 {
     ofstream Magazzino("ordiniSito.html" /*ios::app*/);
 
-    Magazzino << "<div id = \"header\">";
+    Magazzino << "<link rel=\"stylesheet\" href=\"css1.css\">\n<div class=\"oggetto\" id = \"header\">";
 
     Magazzino.close();
 }
@@ -210,6 +210,7 @@ void rcSitoricette(string ricetta)
 {
     ofstream Magazzino("ordiniSito.html", ios::app);
 
+    if(ricetta!="NoN")
     Magazzino << ricetta << "<br>\n";
 
     Magazzino.close();
