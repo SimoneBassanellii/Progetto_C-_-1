@@ -4,5 +4,9 @@ body
     background-repeat: no-repeat;
 }
 
-
+.oggetto {
+    width: 700px;
+    height: 300px;
+    border:none;
+}
 

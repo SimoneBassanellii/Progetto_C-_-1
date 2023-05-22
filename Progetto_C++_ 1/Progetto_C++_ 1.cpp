@@ -208,10 +208,49 @@ void ricettarioSito()
 
 void rcSitoricette(string ricetta)
 {
+
+    string nomeIngre, tipoIngre, nomeRicetta, Procedimento, quantita, ingredienti;
+
+    int dim = 0;
+    string nomi_e_ingre[100], tipo;
+
+    
+
+
     ofstream Magazzino("ordiniSito.html", ios::app);
 
-    if(ricetta!="NoN")
-    Magazzino << ricetta << "<br>\n";
+    nomeRicetta = ricetta.substr(0, ricetta.find(";")); // estrai nome
+    ricetta = ricetta.substr(ricetta.find(";") + 1, ricetta.length()); //togli il nome e lascia solo gli ingredienti e procedimento
+    ingredienti = ricetta.substr(0, ricetta.find(";")); // estrai ingredienti
+    Procedimento = ricetta.substr(ricetta.find(";") + 1, ricetta.length()); //togli gli ingredienti e lascia solo il procedimento
+
+
+    Magazzino << nomeRicetta << "<br>\n";
+
+    //mettiamo gli ingredienti in un array
+    while (ingredienti.find(",") != string::npos)
+    {
+        nomi_e_ingre[dim] = ingredienti.substr(0, ingredienti.find(","));
+        dim++;
+        ingredienti = ingredienti.erase(0, ingredienti.find(",") + 1);
+        //Magazzino << " - " << ingredienti << "<br>\n";
+    }
+    nomi_e_ingre[dim] = ingredienti;
+    //Magazzino << " - " << ingredienti << "<br>\n";
+    dim++;
+
+
+    
+
+    for (int i = 0; i < dim; i++) {
+        nomeIngre = nomi_e_ingre[i].substr(0, nomi_e_ingre[i].find(":")); // estrai nome
+		quantita = nomi_e_ingre[i].substr(nomi_e_ingre[i].find(":") + 1, nomi_e_ingre[i].length()); //estrai quantita e tipo
+
+		Magazzino << " - " << nomeIngre << ":" << quantita << "<br>\n";
+    }
+
+    Magazzino << Procedimento << "<br>\n";
+    
 
     Magazzino.close();
 }
@@ -562,13 +601,13 @@ void Ordine()
     {
         ricetta = RicettaCompleta(scelta);
         
-        rcSitoricette(ricetta);
+        
 
         if (ricetta != "NoN")
         {
             ingredienti = Ingredienti(ricetta);
             ControlloMagazzino(ingredienti);
-
+            rcSitoricette(ricetta);
         }
         else
         {

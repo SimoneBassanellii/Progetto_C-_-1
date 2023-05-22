@@ -1,13 +1,7 @@
-.oggetto {
-   
-    background: rgba(67, 67, 67, 0.812);
-    text-align: center;
-    padding-right: 30%;
-    padding-left: 30%;
-    padding-top: 25px;
-    padding-bottom: 25px;
-    color: aliceblue;
-    width: 50%;
-    height: 200px;
+.oggetto{
+    outline: none;
+    color:aliceblue;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 20px;
 }
 
