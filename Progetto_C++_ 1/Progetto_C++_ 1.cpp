@@ -162,13 +162,13 @@ void ricettarioCompletoSito()
 
     string s;
 
-    Magazzino << "<div id = \"header\">";
+    Magazzino << "<link rel=\"stylesheet\" href=\"css1.css\">\n<div class=\"oggetto\" id = \"header\">";
 
     getline(MagazzinoRead, s);
 
     while (!s.empty())
     {
-        Magazzino << s << "<br>\n";
+        Magazzino << s << "<br><br>\n";
         getline(MagazzinoRead, s);
     }
 
@@ -181,19 +181,79 @@ void ricettarioCompletoSito()
 
 void Magazzino()
 {
-    ofstream Magazzino("magazzino.csv" /*ios::app*/);
+    ifstream MagazzinoRead("magazzino.csv" /*ios::app*/);
+    ofstream MagazzinoWrite("magazzinoTemp.csv", ios::app);
 
     srand(time(NULL));
 
 
-    Magazzino << "farina:" << rand() % 1000 << "_g\n";
-    Magazzino << "zucchero:" << rand() % 1000 << "_g\n";
-    Magazzino << "uova:" << rand() % 50 << "_u\n";
-    Magazzino << "latte:" << rand() % 2000 << "_ml\n";
+    ifstream RicettarioRead("ricettario.csv");
+    int dim;
+    string s, m, nomeMagazzino, nomeRicettario[100], ingredienti;
+    bool trovato = false;
 
-    Magazzino.close();
+    getline(RicettarioRead, s);
+
+    while (!s.empty())
+    {
+        trovato = false;
+        getline(RicettarioRead, s);
+
+        ingredienti = s.substr(s.find(";") +1, s.length());
+        ingredienti = ingredienti.substr(0, ingredienti.find(";"));
+
+
+        //mettiamo gli ingredienti in un array
+        while (ingredienti.find(",") != string::npos)
+        {
+            nomeRicettario[dim] = ingredienti.substr(0, ingredienti.find(","));
+            dim++;
+            ingredienti = ingredienti.erase(0, ingredienti.find(",") + 1);
+            //Magazzino << " - " << ingredienti << "<br>\n";
+        }
+        nomeRicettario[dim] = ingredienti;
+        //Magazzino << " - " << ingredienti << "<br>\n";
+        dim++;
+
+
+        //fai un FOR per ogni ingrediente della ricetta e controlla se è presente nel magazzino
+
+        for (int i = 0; i < dim; i++)
+        {
+
+            getline(MagazzinoRead, m);
+
+            while (!m.empty())
+            {
+                getline(RicettarioRead, m);
+
+                nomeMagazzino = m.substr(0, m.find(":"));
+                if (nomeMagazzino == nomeRicettario[i])
+                {
+                    trovato = true;
+                    break;
+                }
+
+            }
+
+            if (!trovato)
+                MagazzinoWrite << nomeMagazzino.substr(0, nomeMagazzino.find('_')) << rand() % 1000 << nomeMagazzino.substr(nomeMagazzino.find('_'), nomeMagazzino.length()) << "\n"; //trovare il tipo di ingrediente e da li fare il random
+
+            std::remove("magazzino.csv");
+            std::rename("magazzinoTemp.csv", "magazzino.csv");
+            std::remove("magazzinoTemp.csv");
+
+        }
+    }
+
+    MagazzinoWrite.close();
+    MagazzinoRead.close();
+    RicettarioRead.close();
+    
+    
+
+    
 }
-
 
 
 void ricettarioSito()
@@ -225,7 +285,7 @@ void rcSitoricette(string ricetta)
     Procedimento = ricetta.substr(ricetta.find(";") + 1, ricetta.length()); //togli gli ingredienti e lascia solo il procedimento
 
 
-    Magazzino << nomeRicetta << "<br>\n";
+    Magazzino << "<b>" << nomeRicetta << "</b>" << "<br><br>\n";
 
     //mettiamo gli ingredienti in un array
     while (ingredienti.find(",") != string::npos)
@@ -249,7 +309,7 @@ void rcSitoricette(string ricetta)
 		Magazzino << " - " << nomeIngre << ":" << quantita << "<br>\n";
     }
 
-    Magazzino << Procedimento << "<br>\n";
+    Magazzino << Procedimento << "<br><br><br><br>\n";
     
 
     Magazzino.close();
@@ -276,7 +336,7 @@ void magazzinoSito()
 
     string s;
 
-    Magazzino << "<div id = \"header\">";
+    Magazzino << "<link rel=\"stylesheet\" href=\"css1.css\">\n<div class=\"oggetto\" id = \"header\">";
 
     getline(MagazzinoRead, s);
 
@@ -303,7 +363,7 @@ void listaSpesaSito()
 
     string s;
 
-    Magazzino << "<div id = \"header\">";
+    Magazzino << "<link rel=\"stylesheet\" href=\"css1.css\">\n<div class=\"oggetto\" id = \"header\">";
 
     getline(MagazzinoRead, s);
 
@@ -617,7 +677,7 @@ void Ordine()
         cin >> scelta;
     }
 
-    magazzinoSito();
+    
     //rinominare il file vecchio
     ControlloIngredientiPresenti();
     SpesaQuantitastandard();
@@ -628,6 +688,7 @@ void Ordine()
 
     //crei il file di lista spesa per il sito html
     listaSpesaSito();
+    magazzinoSito();
 
     std::remove("listaspesaVecchia.csv");
     std::rename("listaspesa.csv", "listaspesaVecchia.csv");
