@@ -181,23 +181,25 @@ void ricettarioCompletoSito()
 
 void Magazzino()
 {
-    ifstream MagazzinoRead("magazzino.csv" /*ios::app*/);
-    ofstream MagazzinoWrite("magazzinoTemp.csv", ios::app);
+    std::remove("magazzino.csv");
 
     srand(time(NULL));
 
 
     ifstream RicettarioRead("ricettario.csv");
     int dim;
-    string s, m, nomeMagazzino, nomeRicettario[100], ingredienti;
+    string s, m, nomeMagazzino, ingredienti;
     bool trovato = false;
 
     getline(RicettarioRead, s);
 
     while (!s.empty())
     {
+        string nomeRicettario[100];
+
         trovato = false;
-        getline(RicettarioRead, s);
+        dim = 0;
+        
 
         ingredienti = s.substr(s.find(";") +1, s.length());
         ingredienti = ingredienti.substr(0, ingredienti.find(";"));
@@ -209,10 +211,8 @@ void Magazzino()
             nomeRicettario[dim] = ingredienti.substr(0, ingredienti.find(","));
             dim++;
             ingredienti = ingredienti.erase(0, ingredienti.find(",") + 1);
-            //Magazzino << " - " << ingredienti << "<br>\n";
         }
         nomeRicettario[dim] = ingredienti;
-        //Magazzino << " - " << ingredienti << "<br>\n";
         dim++;
 
 
@@ -220,38 +220,48 @@ void Magazzino()
 
         for (int i = 0; i < dim; i++)
         {
+            trovato = false;
+            ifstream MagazzinoRead("magazzino.csv" /*ios::app*/);
+            ofstream MagazzinoWrite("magazzinoTemp.csv");
 
             getline(MagazzinoRead, m);
 
             while (!m.empty())
             {
-                getline(RicettarioRead, m);
+                
 
                 nomeMagazzino = m.substr(0, m.find(":"));
-                if (nomeMagazzino == nomeRicettario[i])
+                if (nomeMagazzino == nomeRicettario[i].substr(0, nomeRicettario[i].find(":")))
                 {
                     trovato = true;
-                    break;
                 }
 
+                MagazzinoWrite << m << "\n";
+
+                getline(MagazzinoRead, m);
             }
 
+            string tipo = nomeRicettario[i].substr(nomeRicettario[i].find('_')+1, nomeRicettario[i].length());
+
             if (!trovato)
-                MagazzinoWrite << nomeMagazzino.substr(0, nomeMagazzino.find('_')) << rand() % 1000 << nomeMagazzino.substr(nomeMagazzino.find('_'), nomeMagazzino.length()) << "\n"; //trovare il tipo di ingrediente e da li fare il random
+                MagazzinoWrite << nomeRicettario[i].substr(0, nomeRicettario[i].find(':')+1) << rand() % (int)QuantitaDefault(tipo) << "_" << tipo << "\n"; //trovare il tipo di ingrediente e da li fare il random
+
+            MagazzinoWrite.close();
+            MagazzinoRead.close();
 
             std::remove("magazzino.csv");
             std::rename("magazzinoTemp.csv", "magazzino.csv");
             std::remove("magazzinoTemp.csv");
 
+            
         }
+
+        getline(RicettarioRead, s);
     }
 
-    MagazzinoWrite.close();
-    MagazzinoRead.close();
+    
     RicettarioRead.close();
     
-    
-
     
 }
 
@@ -821,6 +831,9 @@ void CRUD()
 
 int main()
 {
+    ofstream listaSpesaSito("listaspesaSito.html");
+    listaSpesaSito.close();
+    
     Magazzino();
     magazzinoSito();
     ricettarioSito();
