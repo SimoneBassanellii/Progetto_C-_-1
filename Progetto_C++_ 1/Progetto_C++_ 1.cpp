@@ -13,7 +13,8 @@
 #include <codecvt>
 using namespace std;
 
-std::wstring ExePath() {
+std::wstring ExePath() // Prendo la Path
+{
     TCHAR buffer[MAX_PATH] = { 0 };
     GetModuleFileName(NULL, buffer, MAX_PATH);
     std::wstring::size_type pos = std::wstring(buffer).find_last_of(L"\\/");
@@ -28,7 +29,6 @@ void AperturaHTML()
 
     //use converter (.to_bytes: wstr->str, .from_bytes: str->wstr)
     std::string converted_str = converter.to_bytes(ExePath());
-
 
     // Calcolo la lungheza della stringa
     string spath = converted_str.substr(0, converted_str.length()-10) + "\\Progetto_C++_ 1\\home.html";
@@ -65,16 +65,11 @@ float QuantitaDefault(string tipo)
     return -1;
 }
 
-
-
-
 void SpesaQuantitastandard() 
 {
     string s, nomeLista, tipoTemp;
     int quantitaLista;
-
     ifstream ListaRead("listaspesa.csv");
-
     ofstream ListaWrite("listaspesaTemp.csv", ios::app);
     ofstream CucinaWrite("cucina.csv");
 
@@ -86,15 +81,9 @@ void SpesaQuantitastandard()
         quantitaLista = stoi(s.substr(s.find(":") + 1, s.find("_"))); // estrai quantita
         tipoTemp = s.substr(s.find("_") + 1, s.length()); // estrai tipo
 
-
         CucinaWrite << nomeLista << ":" << quantitaLista << "_" << tipoTemp << endl;
-
-        
         quantitaLista = ceil(quantitaLista / QuantitaDefault(tipoTemp)) * QuantitaDefault(tipoTemp); // arrotonda per eccesso alla quantità standard
-
-
         ListaWrite << nomeLista << ":" << quantitaLista << "_" << tipoTemp << endl; // scrivi nel file temporaneo
-
 
         std::getline(ListaRead, s);
     }
@@ -106,10 +95,7 @@ void SpesaQuantitastandard()
     std::remove("listaspesa.csv");
     std::rename("listaspesaTemp.csv", "listaspesa.csv");
     std::remove("listaspesaTemp.csv");
-
 }
-
-
 
 string RicettaCompleta(string nome)
 {
@@ -130,8 +116,6 @@ string RicettaCompleta(string nome)
     return ricetta;
 }
 
-
-
 void ListaSpesa(string nome, float quantita, string tipoIngrediente)
 {
     bool trovato = false;
@@ -140,13 +124,9 @@ void ListaSpesa(string nome, float quantita, string tipoIngrediente)
     ifstream ListaRead("listaspesa.csv", ios::app);
     ofstream ListaWrite("listaspesaTemp.csv", ios::app);
 
-
-
     std::getline(ListaRead, s);
-
-
-    //controllo se trovo l'ingrediente nel file
-    while (!s.empty())
+    
+    while (!s.empty()) //controllo se trovo l'ingrediente nel file
     {
         nomeTemp = s.substr(0, s.find(":"));
         quantitaTemp = stoi(s.substr(s.find(":") + 1, s.find("_")));
@@ -163,12 +143,8 @@ void ListaSpesa(string nome, float quantita, string tipoIngrediente)
         {
             ListaWrite << nomeTemp << ":" << quantitaTemp << "_" << tipo << endl;
         }
-
-
-        //Fai il nuovo file copia e aggiungi
         std::getline(ListaRead, s);
     }
-
 
     if (!trovato)
     {
@@ -182,11 +158,7 @@ void ListaSpesa(string nome, float quantita, string tipoIngrediente)
     std::remove("listaspesa.csv");
     std::rename("listaspesaTemp.csv", "listaspesa.csv");
     std::remove("listaspesaTemp.csv");
-
-
-
 }
-
 
 string Ingredienti(string ricetta)
 {
@@ -199,12 +171,10 @@ string Ingredienti(string ricetta)
 void ricettarioCompletoSito()
 {
     ifstream MagazzinoRead("ricettario.csv");
-    ofstream Magazzino("ricettarioSito.html" /*ios::app*/);
-
+    ofstream Magazzino("ricettarioSito.html");
     string s;
 
     Magazzino << "<link rel=\"stylesheet\" href=\"css1.css\">\n<div class=\"oggetto\" id = \"header\">";
-
     getline(MagazzinoRead, s);
 
     while (!s.empty())
@@ -213,20 +183,14 @@ void ricettarioCompletoSito()
         getline(MagazzinoRead, s);
     }
 
-
     Magazzino << "</div>";
-
     Magazzino.close();
 }
-
 
 void Magazzino()
 {
     std::remove("magazzino.csv");
-
     srand(time(NULL));
-
-
     ifstream RicettarioRead("ricettario.csv");
     int dim;
     string s, m, nomeMagazzino, ingredienti;
@@ -237,17 +201,12 @@ void Magazzino()
     while (!s.empty())
     {
         string nomeRicettario[100];
-
         trovato = false;
         dim = 0;
-        
-
         ingredienti = s.substr(s.find(";") +1, s.length());
         ingredienti = ingredienti.substr(0, ingredienti.find(";"));
 
-
-        //mettiamo gli ingredienti in un array
-        while (ingredienti.find(",") != string::npos)
+        while (ingredienti.find(",") != string::npos) //mettiamo gli ingredienti in un array
         {
             nomeRicettario[dim] = ingredienti.substr(0, ingredienti.find(","));
             dim++;
@@ -256,32 +215,23 @@ void Magazzino()
         nomeRicettario[dim] = ingredienti;
         dim++;
 
-
-        //fai un FOR per ogni ingrediente della ricetta e controlla se è presente nel magazzino
-
-        for (int i = 0; i < dim; i++)
+        for (int i = 0; i < dim; i++) //fai un FOR per ogni ingrediente della ricetta e controlla se è presente nel magazzino
         {
             trovato = false;
-            ifstream MagazzinoRead("magazzino.csv" /*ios::app*/);
+            ifstream MagazzinoRead("magazzino.csv");
             ofstream MagazzinoWrite("magazzinoTemp.csv");
-
             getline(MagazzinoRead, m);
 
             while (!m.empty())
             {
-                
-
                 nomeMagazzino = m.substr(0, m.find(":"));
                 if (nomeMagazzino == nomeRicettario[i].substr(0, nomeRicettario[i].find(":")))
                 {
                     trovato = true;
                 }
-
                 MagazzinoWrite << m << "\n";
-
                 getline(MagazzinoRead, m);
             }
-
             string tipo = nomeRicettario[i].substr(nomeRicettario[i].find('_')+1, nomeRicettario[i].length());
 
             if (!trovato)
@@ -292,99 +242,63 @@ void Magazzino()
 
             std::remove("magazzino.csv");
             std::rename("magazzinoTemp.csv", "magazzino.csv");
-            std::remove("magazzinoTemp.csv");
-
-            
+            std::remove("magazzinoTemp.csv");            
         }
-
         getline(RicettarioRead, s);
-    }
-
-    
-    RicettarioRead.close();
-    
-    
+    }    
+    RicettarioRead.close();   
 }
-
 
 void ricettarioSito()
 {
-    ofstream Magazzino("ordiniSito.html" /*ios::app*/);
-
+    ofstream Magazzino("ordiniSito.html");
     Magazzino << "<link rel=\"stylesheet\" href=\"css1.css\">\n<div class=\"oggetto\" id = \"header\">";
-
     Magazzino.close();
 }
 
-
 void rcSitoricette(string ricetta)
 {
-
     string nomeIngre, tipoIngre, nomeRicetta, Procedimento, quantita, ingredienti;
-
     int dim = 0;
     string nomi_e_ingre[100], tipo;
-
-    
-
-
     ofstream Magazzino("ordiniSito.html", ios::app);
 
     nomeRicetta = ricetta.substr(0, ricetta.find(";")); // estrai nome
     ricetta = ricetta.substr(ricetta.find(";") + 1, ricetta.length()); //togli il nome e lascia solo gli ingredienti e procedimento
     ingredienti = ricetta.substr(0, ricetta.find(";")); // estrai ingredienti
     Procedimento = ricetta.substr(ricetta.find(";") + 1, ricetta.length()); //togli gli ingredienti e lascia solo il procedimento
-
-
     Magazzino << "<b>" << nomeRicetta << "</b>" << "<br><br>\n";
 
-    //mettiamo gli ingredienti in un array
-    while (ingredienti.find(",") != string::npos)
+    while (ingredienti.find(",") != string::npos) //mettiamo gli ingredienti in un array
     {
         nomi_e_ingre[dim] = ingredienti.substr(0, ingredienti.find(","));
         dim++;
         ingredienti = ingredienti.erase(0, ingredienti.find(",") + 1);
-        //Magazzino << " - " << ingredienti << "<br>\n";
     }
     nomi_e_ingre[dim] = ingredienti;
-    //Magazzino << " - " << ingredienti << "<br>\n";
-    dim++;
-
-
-    
+    dim++;   
 
     for (int i = 0; i < dim; i++) {
         nomeIngre = nomi_e_ingre[i].substr(0, nomi_e_ingre[i].find(":")); // estrai nome
 		quantita = nomi_e_ingre[i].substr(nomi_e_ingre[i].find(":") + 1, nomi_e_ingre[i].length()); //estrai quantita e tipo
-
 		Magazzino << " - " << nomeIngre << ":" << quantita << "<br>\n";
     }
 
     Magazzino << Procedimento << "<br><br><br><br>\n";
-    
-
     Magazzino.close();
 }
-
 
 void ricettarioSitoEnd()
 {
     ofstream Magazzino("ordiniSito.html", ios::app);
-
     Magazzino << "</div>";
-
     Magazzino.close();
 }
-
-
-
-
 
 void magazzinoSito()
 {
     ifstream MagazzinoRead("magazzino.csv");
     ofstream Magazzino("magazzinoSito.html" /*ios::app*/);
-
     string s;
 
     Magazzino << "<link rel=\"stylesheet\" href=\"css1.css\">\n<div class=\"oggetto\" id = \"header\">";
@@ -396,22 +310,15 @@ void magazzinoSito()
 		Magazzino << s << "<br>\n";
 		getline(MagazzinoRead, s);
 	}
-
     
     Magazzino << "</div>";
-
     Magazzino.close();
 }
-
-
-
-
 
 void listaSpesaSito()
 {
     ifstream MagazzinoRead("listaspesa.csv");
     ofstream Magazzino("listaspesaSito.html" /*ios::app*/);
-
     string s;
 
     Magazzino << "<link rel=\"stylesheet\" href=\"css1.css\">\n<div class=\"oggetto\" id = \"header\">";
@@ -424,14 +331,9 @@ void listaSpesaSito()
         getline(MagazzinoRead, s);
     }
 
-
     Magazzino << "</div>";
-
     Magazzino.close();
 }
-
-
-
 
 void ControlloIngredientiPresenti()
 {
@@ -439,9 +341,7 @@ void ControlloIngredientiPresenti()
     int quantitaMagazzino, quantitaLista;
     bool trovato = false;
     ifstream ListaRead("listaspesa.csv");
-
     ofstream ListaWrite("listaspesaTemp.csv", ios::app);
-
     std::getline(ListaRead, s);
 
     while (!s.empty())
@@ -449,7 +349,6 @@ void ControlloIngredientiPresenti()
         nomeLista = s.substr(0, s.find(":")); // estrai nome
         quantitaLista = stoi(s.substr(s.find(":") + 1, s.find("_"))); // estrai quantita
         tipoTemp = s.substr(s.find("_") + 1, s.length()); // estrai tipo
-
 
         ofstream MagazzinoWrite("magazzinoTemp.csv", ios::app);
         ifstream MagazzinoRead("magazzino.csv");
@@ -464,37 +363,28 @@ void ControlloIngredientiPresenti()
             if (nomeLista == nomeMagazzino)
             {
                 trovato = true;
-                if (quantitaMagazzino < quantitaLista)
+                if (quantitaMagazzino < quantitaLista) //scrivo nella lista
                 {
 
                     quantitaLista = quantitaLista - quantitaMagazzino;
                     quantitaMagazzino = 0;
-                    //scivo nella lista
                     ListaWrite << nomeLista << ":" << quantitaLista << "_" << tipo << endl;
                 }
-                else
+                else //non scrivo nella lista
                 {
                     quantitaMagazzino = quantitaMagazzino - quantitaLista;
-                    //non scrivo nella lista
                 }
-            }
-            //scrivo nel magazzino
-            MagazzinoWrite << nomeMagazzino << ":" << quantitaMagazzino << "_" << tipo << endl;
-            //sovrascrivo magazzino
-
-
+            }        
+            MagazzinoWrite << nomeMagazzino << ":" << quantitaMagazzino << "_" << tipo << endl; //scrivo nel magazzino
             std::getline(MagazzinoRead, m);
-
         }
 
         if (trovato == false)
         {
             nomeMagazzino = nomeLista;
             quantitaMagazzino = 0;
-            //scrivo nel magazzino
-            MagazzinoWrite << nomeMagazzino << ":" << quantitaMagazzino << "_" << tipoTemp << endl;
-            //riscrivo nella lista
-            ListaWrite << nomeLista << ":" << quantitaLista << "_" << tipoTemp << endl;
+            MagazzinoWrite << nomeMagazzino << ":" << quantitaMagazzino << "_" << tipoTemp << endl; //scrivo nel magazzino
+            ListaWrite << nomeLista << ":" << quantitaLista << "_" << tipoTemp << endl; //riscrivo nella lista
         }
 
         MagazzinoRead.close();
@@ -502,11 +392,6 @@ void ControlloIngredientiPresenti()
         std::remove("magazzino.csv");
         std::rename("magazzinoTemp.csv", "magazzino.csv");
         std::remove("magazzinoTemp.csv");
-
-
-        //sovrascrivo lista
-
-
         std::getline(ListaRead, s);
     }
 
@@ -516,11 +401,7 @@ void ControlloIngredientiPresenti()
     std::remove("listaspesa.csv");
     std::rename("listaspesaTemp.csv", "listaspesa.csv");
     std::remove("listaspesaTemp.csv");
-
-
 }
-
-
 
 void ControlloMagazzino(string ingredienti)
 {
@@ -533,11 +414,9 @@ void ControlloMagazzino(string ingredienti)
         nomi_e_ingre[dim] = ingredienti.substr(0, ingredienti.find(","));
         dim++;
         ingredienti = ingredienti.erase(0, ingredienti.find(",") + 1);
-        //cout << "\ningredienti rimanenti: " << ingredienti;
     }
     nomi_e_ingre[dim] = ingredienti;
     dim++;
-
 
     string nome, nomeTemp, s;
     int quantita, quantitaTemp;
@@ -549,21 +428,10 @@ void ControlloMagazzino(string ingredienti)
         nome = nomi_e_ingre[i].substr(0, nomi_e_ingre[i].find(":"));
         quantita = stoi(nomi_e_ingre[i].substr(nomi_e_ingre[i].find(":") + 1, nomi_e_ingre[i].find("_")));
         tipo = nomi_e_ingre[i].substr(nomi_e_ingre[i].find("_") + 1, nomi_e_ingre[i].length());
-
-
         ListaSpesa(nome, quantita, tipo); //non somma
     }
-
-    //Controllare se nella lista della spesa c'è già l'ingrediente e se non c'è aggiungerlo dalla lista della spesa
-
-
     sr.close();
-
-
 }
-
-
-
 
 void Compra()
 {
@@ -572,8 +440,6 @@ void Compra()
     float quantita;
     int ricavo;
     ifstream Leggiamo("listaspesa.csv");
-
-
     std::getline(Leggiamo, s);
 
     while (!s.empty())
@@ -582,34 +448,23 @@ void Compra()
         ricavo = stoi(s.substr(s.find(":") + 1, s.find("_"))); // estrai quantita
         tipo = s.substr(s.find("_") + 1, s.length());
 
-
-
         //scala la quantita utilizzata
-
-
-
         ifstream CucinaRead("cucina.csv");
-
         std::getline(CucinaRead, p);
 
         while (!p.empty())
         {
             nomeCucina = p.substr(0, p.find(":")); // estrai nome
 
-            if (nomeCucina == nomeLista) {
+            if (nomeCucina == nomeLista) 
+            {
                 quantitaCucina = stoi(p.substr(p.find(":") + 1, p.find("_"))); // estrai quantita
                 ricavo = ricavo - quantitaCucina;
-
-            }
-            
-            
+            }            
             std::getline(CucinaRead, p);
         }
 
         CucinaRead.close();
-
-
-
 
         ofstream MagazzinoWrite("magazzinoTemp.csv", ios::app);
         ifstream MagazzinoRead("magazzino.csv");
@@ -624,9 +479,8 @@ void Compra()
             {
                 quantitaMagazzino = quantitaMagazzino + ricavo;
             }
-
+            
             MagazzinoWrite << nomeMagazzino << ":" << quantitaMagazzino << "_" << tipoMagazzino << endl;
-
             std::getline(MagazzinoRead, m);
         }
 
@@ -635,12 +489,9 @@ void Compra()
         std::remove("magazzino.csv");
         std::rename("magazzinoTemp.csv", "magazzino.csv");
         std::remove("magazzinoTemp.csv");
-
-
         std::getline(Leggiamo, s);
     }
 }
-
 
 void Aggiungi()
 {
@@ -649,7 +500,6 @@ void Aggiungi()
 
     ofstream MagazzinoWrite("magazzinoTemp.csv", ios::app);
     ifstream MagazzinoRead("magazzino.csv");
-
 
     std::getline(MagazzinoRead, m);
     while (!m.empty())
@@ -675,19 +525,12 @@ void Aggiungi()
     std::remove("magazzinoTemp.csv");
 }
 
-
-
 void Ordine()
 {
-    /*ofstream MyFile("filename.txt");
-    MyFile << "test";
-    MyFile.close();*/
     string ingredienti, ricetta, s;
     string scelta = "";
     int scelta2 = -1;
     int i = 0;
-
-
 
     ifstream Ricette("ricettario.csv");
 
@@ -705,15 +548,11 @@ void Ordine()
     cout << "\nPremi 0 per Uscire\n" << endl;
     Ricette.close();
 
-    
-
     cin >> scelta; 
     while (scelta != "0")
     {
         ricetta = RicettaCompleta(scelta);
         
-        
-
         if (ricetta != "NoN")
         {
             ingredienti = Ingredienti(ricetta);
@@ -724,16 +563,15 @@ void Ordine()
         {
             cout << "Ricetta non trovata\n";
         }
-
         cin >> scelta;
     }
-
     
     //rinominare il file vecchio
     ControlloIngredientiPresenti();
     SpesaQuantitastandard();
     Compra();
     Aggiungi();
+    
     //qui aggiungi
     ricettarioSitoEnd();
 
@@ -800,7 +638,6 @@ void ModificaRicetta() {
     {
         if (s.substr(0, s.find(";")) != nome)
         {
-
             RicetteTemp << s << endl;
         }
         else
@@ -814,7 +651,6 @@ void ModificaRicetta() {
     std::remove("ricettario.csv");
     std::rename("ricettarioTemp.csv", "ricettario.csv");
     std::remove("ricettarioTemp.csv");
-
 }
 
 void VisualizzaRicette()
@@ -833,7 +669,6 @@ void VisualizzaRicette()
 void CRUD()
 {
     int scelta = -1;
-
 
     while (scelta != 0)
     {
@@ -865,11 +700,8 @@ void CRUD()
         case 0:
             break;
         }
-
         ricettarioCompletoSito();
     }
-
-
 }
 
 int main()
