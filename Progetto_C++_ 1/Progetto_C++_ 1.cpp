@@ -4,24 +4,65 @@
 #include <list>
 #include <cmath>
 #include <stdlib.h>
+#include <Windows.h>
+#include <stringapiset.h>
+#include <shellapi.h>
+#include <winuser.h>
+#include "Tchar.h"
+#include <locale>
+#include <codecvt>
 using namespace std;
+
+std::wstring ExePath() {
+    TCHAR buffer[MAX_PATH] = { 0 };
+    GetModuleFileName(NULL, buffer, MAX_PATH);
+    std::wstring::size_type pos = std::wstring(buffer).find_last_of(L"\\/");
+    return std::wstring(buffer).substr(0, pos);
+}
+
+void AperturaHTML() 
+{
+    //setup converter
+    using convert_type = std::codecvt_utf8<wchar_t>;
+    std::wstring_convert<convert_type, wchar_t> converter;
+
+    //use converter (.to_bytes: wstr->str, .from_bytes: str->wstr)
+    std::string converted_str = converter.to_bytes(ExePath());
+
+
+    // Calcolo la lungheza della stringa
+    string spath = converted_str.substr(0, converted_str.length()-10) + "\\Progetto_C++_ 1\\home.html";
+    int wideLen = MultiByteToWideChar(CP_UTF8, 0, spath.c_str(), -1, NULL, 0);
+
+    // Alloco la memoria per la stringa
+    wchar_t* wideStr = new wchar_t[wideLen];
+
+    // Converto la stringa
+    MultiByteToWideChar(CP_UTF8, 0, spath.c_str(), -1, wideStr, wideLen);
+
+    // Uso la wide string
+    LPCWSTR wpath = wideStr;
+
+    // Apri il Browser
+    ShellExecuteW(NULL, L"open", wpath, NULL, NULL, SW_SHOWNORMAL);
+}
 
 float QuantitaDefault(string tipo)
 {
     float quantita;
     if (tipo == "g")
     {
-        quantita = 500;
+        return quantita = 500;
     }
     else if (tipo == "ml")
     {
-        quantita = 1000;
+        return quantita = 1000;
     }
     else if (tipo == "u")
     {
-        quantita = 12;
+        return quantita = 12;
     }
-    return quantita;
+    return -1;
 }
 
 
@@ -703,6 +744,8 @@ void Ordine()
     std::remove("listaspesaVecchia.csv");
     std::rename("listaspesa.csv", "listaspesaVecchia.csv");
     std::remove("magazzinoTemp.csv");
+
+    AperturaHTML();
 }
 
 void AggiungiRicetta()
